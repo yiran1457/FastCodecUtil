@@ -1,0 +1,34 @@
+package com.yiran.fastcodecutil.codecs;
+
+import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
+import com.yiran.fastcodecutil.FastCodecUtil;
+import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import org.slf4j.Logger;
+
+public record Object2IntMapCodec<K>(Codec<K> keyCodec) implements IMapCodec<K, Integer, Object2IntMap<K>> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    @Override
+    public Codec<Integer> elementCodec() {
+        return Codec.INT;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
+    public StreamCodec<ByteBuf, Integer> getElementStreamCodec() {
+        return ByteBufCodecs.INT;
+    }
+
+    @Override
+    public Object2IntMap<K> getMap(long count) {
+        return count < FastCodecUtil.CapChoiceFactor ? new Object2IntArrayMap<>() : new Object2IntOpenHashMap<>();
+    }
+}
