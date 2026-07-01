@@ -6,9 +6,14 @@ import com.google.common.collect.Multimaps;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import com.yiran.fastcodecutil.codecs.stream.ListMultimapStreamCodec;
+import com.yiran.fastcodecutil.codecs.stream.PairStreamCodec;
+import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.List;
 import java.util.Map;
@@ -45,13 +50,13 @@ public class FastMultimapUtil {
                 .xmap(FastMultimapUtil::list2MultiMap, FastMultimapUtil::multiMap2List);
     }
 
-    public static <K, V> Codec<ListMultimap<K, V>> multimapCodec(Codec<K> keyCodec, Codec<V> elementCodec) {
-        return listOf(Codec.pair(keyCodec, elementCodec))
-                .xmap(FastMultimapUtil::list2MultiMap, FastMultimapUtil::multiMap2List);
+    public static <K, V, B extends ByteBuf> StreamCodec<B, ListMultimap<K, V>> createStreamMap(StreamCodec<B, K> keyCodec, StreamCodec<B, V> elementCodec) {
+        return ListMultimapStreamCodec.create(keyCodec, elementCodec);
     }
 
-    public static <T> Codec<ObjectArrayList<T>> listOf(Codec<T> codec) {
-        return codec.listOf().xmap(ObjectArrayList::new, Function.identity());
+    public static <K, V> Codec<ListMultimap<K, V>> multimapCodec(Codec<K> keyCodec, Codec<V> elementCodec) {
+        return Codec.pair(keyCodec, elementCodec).listOf()
+                .xmap(FastMultimapUtil::list2MultiMap, FastMultimapUtil::multiMap2List);
     }
 
     private static <K, V> ListMultimap<K, V> list2MultiMap(List<Pair<K, V>> list) {
