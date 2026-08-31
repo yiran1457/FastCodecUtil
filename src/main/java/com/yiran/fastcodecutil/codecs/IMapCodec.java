@@ -19,15 +19,15 @@ public interface IMapCodec<K, V, M extends Map<K, V>> extends Codec<M> {
 
     M getMap(long count);
 
-    default StreamCodec<ByteBuf, K> getKeyStreamCodec() {
-        return ByteBufCodecs.fromCodec(keyCodec());
+    default StreamCodec<? extends ByteBuf, K> getKeyStreamCodec() {
+        return ByteBufCodecs.fromCodecWithRegistries(keyCodec());
     }
 
-    default StreamCodec<ByteBuf, V> getElementStreamCodec() {
-        return ByteBufCodecs.fromCodec(elementCodec());
+    default StreamCodec<? extends ByteBuf, V> getElementStreamCodec() {
+        return ByteBufCodecs.fromCodecWithRegistries(elementCodec());
     }
 
-    default StreamCodec<ByteBuf, M> toStreamCodec() {
+    default StreamCodec<? extends ByteBuf, M> toStreamCodec() {
         return ByteBufCodecs.map(
                 this::getMap,
                 getKeyStreamCodec(),

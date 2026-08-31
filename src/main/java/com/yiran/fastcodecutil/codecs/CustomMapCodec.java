@@ -2,13 +2,15 @@ package com.yiran.fastcodecutil.codecs;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 import org.slf4j.Logger;
 
 import java.util.Map;
 
 public record CustomMapCodec<K, V, M extends Map<K, V>>(Codec<K> keyCodec, Codec<V> elementCodec,
-                                                        Long2ObjectFunction<M> mapGetter) implements IMapCodec<K, V, M> {
+                                                        Int2ObjectFunction<M> mapGetter) implements IMapCodec<K, V, M> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     @Override
@@ -18,6 +20,6 @@ public record CustomMapCodec<K, V, M extends Map<K, V>>(Codec<K> keyCodec, Codec
 
     @Override
     public M getMap(long count) {
-        return mapGetter.apply(count);
+        return mapGetter.apply((int) count);
     }
 }
