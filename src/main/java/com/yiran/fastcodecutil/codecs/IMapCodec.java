@@ -3,9 +3,11 @@ package com.yiran.fastcodecutil.codecs;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Map;
@@ -19,19 +21,37 @@ public interface IMapCodec<K, V, M extends Map<K, V>> extends Codec<M> {
 
     M getMap(long count);
 
-    default StreamCodec<? extends ByteBuf, K> getKeyStreamCodec() {
-        return ByteBufCodecs.fromCodecWithRegistries(keyCodec());
+    default StreamCodec<ByteBuf, K> getKeyStreamCodec() {
+        return ByteBufCodecs.fromCodec(keyCodec());
     }
 
-    default StreamCodec<? extends ByteBuf, V> getElementStreamCodec() {
-        return ByteBufCodecs.fromCodecWithRegistries(elementCodec());
+    default StreamCodec<ByteBuf, V> getElementStreamCodec() {
+        return ByteBufCodecs.fromCodec(elementCodec());
     }
 
-    default StreamCodec<? extends ByteBuf, M> toStreamCodec() {
+    default <B extends ByteBuf> StreamCodec<B, M> toStreamCodec(){
+        return toStreamCodec(this);
+    }
+
+    static <B extends ByteBuf, K, V, M extends Map<K, V>> StreamCodec<B, M> toStreamCodec(
+            IMapCodec<K, V, M> iMapCodec,
+            @Nullable StreamCodec<? super B, K> keyStreamCodec,
+            @Nullable StreamCodec<? super B, V> elementStreamCodec
+    ) {
         return ByteBufCodecs.map(
-                this::getMap,
-                getKeyStreamCodec(),
-                getElementStreamCodec()
+                iMapCodec::getMap,
+                keyStreamCodec == null ? iMapCodec.getKeyStreamCodec() : keyStreamCodec,
+                elementStreamCodec == null ? iMapCodec.getElementStreamCodec() : elementStreamCodec
+        );
+    }
+
+    static <B extends ByteBuf, K, V, M extends Map<K, V>> StreamCodec<B, M> toStreamCodec(
+            IMapCodec<K, V, M> iMapCodec
+    ) {
+        return ByteBufCodecs.map(
+                iMapCodec::getMap,
+                iMapCodec.getKeyStreamCodec(),
+                iMapCodec.getElementStreamCodec()
         );
     }
 
