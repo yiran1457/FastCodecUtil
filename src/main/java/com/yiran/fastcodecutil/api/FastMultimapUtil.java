@@ -13,11 +13,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.Item;
 
 import java.util.List;
 import java.util.Map;
@@ -58,12 +54,12 @@ public class FastMultimapUtil {
     }
 
     public static <K, V> Codec<ListMultimap<K, V>> multimapCodecWithList(Codec<K> keyCodec, Codec<V> elementCodec) {
-        return Codec.pair(keyCodec, elementCodec).listOf()
+        return FastCollectionUtil.listOf(Codec.pair(keyCodec, elementCodec))
                 .xmap(FastMultimapUtil::list2MultiMap, FastMultimapUtil::multiMap2List);
     }
 
     public static <K, V> Codec<ListMultimap<K, V>> multimapCodecWithMap(Codec<K> keyCodec, Codec<V> elementCodec) {
-        return new Object2ObjectMapCodec<>(keyCodec, elementCodec.listOf())
+        return new Object2ObjectMapCodec<>(keyCodec, FastCollectionUtil.listOf(elementCodec))
                 .xmap(FastMultimapUtil::map2MultiMap, FastMultimapUtil::multiMap2Map);
     }
 

@@ -3,8 +3,6 @@ package com.yiran.fastcodecutil.codecs;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.Nullable;

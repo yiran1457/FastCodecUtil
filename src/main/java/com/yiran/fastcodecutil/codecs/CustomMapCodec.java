@@ -2,9 +2,7 @@ package com.yiran.fastcodecutil.codecs;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
-import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
-import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
 import org.slf4j.Logger;
 
 import java.util.Map;

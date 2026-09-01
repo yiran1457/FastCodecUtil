@@ -1,25 +1,25 @@
 package com.yiran.fastcodecutil.api;
 
 import com.mojang.serialization.Codec;
+import com.yiran.fastcodecutil.codecs.CollectionCodec;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class FastCollectionUtil {
-    private FastCollectionUtil() {
+    public static <T> Codec<List<T>> listOf(Codec<T> codec) {
+        return new CollectionCodec<>(ObjectArrayList::new, codec);
     }
 
-    public static <T> Codec<ObjectArrayList<T>> listOf(Codec<T> codec) {
-        return codec.listOf().xmap(ObjectArrayList::new, Function.identity());
+    public static <T> Codec<Set<T>> setOf(Codec<T> codec) {
+        return new CollectionCodec<>(ObjectOpenHashSet::new, codec);
     }
 
-    public static <T> Codec<ObjectArraySet<T>> setArrayOf(Codec<T> codec) {
-        return codec.listOf().xmap(ObjectArraySet::new, ObjectArrayList::new);
-    }
-
-    public static <T> Codec<ObjectOpenHashSet<T>> setHashOf(Codec<T> codec) {
-        return codec.listOf().xmap(ObjectOpenHashSet::new, ObjectArrayList::new);
+    public static <T, L extends Collection<T>> Codec<L> collectionOf(Codec<T> codec, Supplier<L> collectionProvider) {
+        return new CollectionCodec<>(collectionProvider, codec);
     }
 }

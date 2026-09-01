@@ -5,8 +5,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
-public record PairStreamCodec<B extends ByteBuf, K, V>(StreamCodec<B, K> keyCodec,
-                                                       StreamCodec<B, V> valueCodec) implements StreamCodec<B, Pair<K, V>> {
+public record PairStreamCodec<B extends ByteBuf, K, V>(StreamCodec<? super B, K> keyCodec,
+                                                       StreamCodec<? super B, V> valueCodec) implements StreamCodec<B, Pair<K, V>> {
 
     public static <B extends ByteBuf, K, V> PairStreamCodec<B, K, V> create(StreamCodec<B, K> keyCodec, StreamCodec<B, V> valueCodec) {
         return new PairStreamCodec<>(keyCodec, valueCodec);
